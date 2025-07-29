@@ -3,6 +3,7 @@ package com.example.carmanager.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name= "car")
 public class Car {
 
     @Id
@@ -11,6 +12,16 @@ public class Car {
 
     private String brand;
     private String model;
+
+    public String getFarbe() {
+        return farbe;
+    }
+
+    public void setFarbe(String farbe) {
+        this.farbe = farbe;
+    }
+
+    private String farbe;
 
     @Column(name = "`year`")
     private int year;

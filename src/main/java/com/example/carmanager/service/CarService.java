@@ -44,6 +44,8 @@ public class CarService {
         {
             a.setBrand(uCar.getBrand());
             a.setModel(uCar.getModel());
+            a.setYear(uCar.getYear());
+            a.setFarbe(uCar.getFarbe());
 return carRepository.save(a);
 
         } ).orElseThrow(()-> new RuntimeException("Auto nicht gefunden"));
