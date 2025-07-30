@@ -2,6 +2,7 @@ package com.example.carmanager.controller;
 
 import com.example.carmanager.model.Car;
 import com.example.carmanager.service.CarService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class CarController {
         return carService.getCarById(id).map(a-> ResponseEntity.ok(a)).orElse(ResponseEntity.notFound().build());
     }
 @PostMapping
-    public Car createCar(@RequestBody Car car){
+    public Car createCar(@Valid @RequestBody Car car){
        return carService.createCar(car);
 }
 

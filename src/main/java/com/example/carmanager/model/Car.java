@@ -1,6 +1,9 @@
 package com.example.carmanager.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name= "car")
@@ -9,22 +12,18 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @NotBlank(message = "Brand must not be blank")
     private String brand;
+
+    @NotBlank(message = "Model must not be blank")
     private String model;
-
-    public String getFarbe() {
-        return farbe;
-    }
-
-    public void setFarbe(String farbe) {
-        this.farbe = farbe;
-    }
 
     private String farbe;
 
     @Column(name = "`year`")
+    @Min(value= 1886, message = "Year must be 1886 or later")
     private int year;
+
 
 
     public Car() {}
@@ -52,6 +51,13 @@ public class Car {
 
     public void setModel(String model) {
         this.model = model;
+    }
+    public String getFarbe() {
+        return farbe;
+    }
+
+    public void setFarbe(String farbe) {
+        this.farbe = farbe;
     }
 
     public int getYear() {
