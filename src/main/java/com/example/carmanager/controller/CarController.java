@@ -28,7 +28,7 @@ public class CarController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Car> getCarById(@PathVariable Long id){
-        return carService.getCarById(id).map(a-> ResponseEntity.ok(a)).orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(carService.getCarById(id));
     }
 @PostMapping
     public Car createCar(@Valid @RequestBody Car car){

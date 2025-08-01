@@ -1,4 +1,5 @@
 package com.example.carmanager.service;
+import com.example.carmanager.exception.CarNotFoundException;
 import com.example.carmanager.model.Car;
 import com.example.carmanager.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,9 @@ public class CarService {
         return  carRepository.findAll();
     }
 
-    public Optional<Car> getCarById (long id){
-      return  carRepository.findById(id);
+    public Car getCarById (long id){
+        return carRepository.findById(id).orElseThrow(()-> new CarNotFoundException(id));
+
 
     }
 
@@ -33,10 +35,13 @@ public class CarService {
 
     }
 
-    public void deleteCar(Long id ){
-
-        carRepository.deleteById(id);
-
+    public void deleteCar(Long id ) {
+        Optional<Car> auto = carRepository.findById(id);
+        if (auto.isPresent()) {
+            carRepository.deleteById(id);
+        } else {
+            throw new CarNotFoundException(id);
+        }
     }
 
     public Car updateCar ( Long id, Car uCar){
@@ -48,7 +53,7 @@ public class CarService {
             a.setFarbe(uCar.getFarbe());
 return carRepository.save(a);
 
-        } ).orElseThrow(()-> new RuntimeException("Auto nicht gefunden"));
+        } ).orElseThrow(()-> new CarNotFoundException(id));
 
 
 
