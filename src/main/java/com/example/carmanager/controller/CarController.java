@@ -3,6 +3,7 @@ package com.example.carmanager.controller;
 import com.example.carmanager.model.Car;
 import com.example.carmanager.service.CarService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,21 +32,25 @@ public class CarController {
         return ResponseEntity.ok(carService.getCarById(id));
     }
 @PostMapping
-    public Car createCar(@Valid @RequestBody Car car){
-       return carService.createCar(car);
+public ResponseEntity<Car> createCar(@Valid @RequestBody Car car){
+    Car savedCar = carService.createCar(car);
+    return ResponseEntity.status(HttpStatus.CREATED).body(savedCar);
 }
+
+
 
 
 @PutMapping("/{id}")
-    public Car updateCar(@PathVariable Long id, @RequestBody Car car){
-       return carService.updateCar(id,car);
-
+public ResponseEntity<Car> updateCar(@PathVariable Long id, @RequestBody Car car){
+    Car updatedCar = carService.updateCar(id,car);
+    return ResponseEntity.ok(updatedCar);
 }
 
-@DeleteMapping ("/{id}")
-public void deleteCar(@PathVariable Long id){
-       carService.deleteCar(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCar(@PathVariable Long id){
+        carService.deleteCar(id);
+        return ResponseEntity.noContent().build();
+    }
 
-}
 
 }
