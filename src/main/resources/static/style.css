@@ -1,48 +1,90 @@
 body {
-  font-family: Arial, sans-serif;
-  margin: 2rem;
-  background: #f4f4f4;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #e0eafc, #cfdef3);
+    color: #333;
 }
 
-#dein {
-color: red;
-
+.container {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 h1, h2 {
-  color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #222;
 }
 
-form {
-  margin-bottom: 2rem;
+.form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 30px;
 }
 
 input {
-  margin: 0.5rem;
-  padding: 0.5rem;
+    padding: 12px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border 0.3s;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
 }
 
 button {
-  padding: 0.5rem 1rem;
+    grid-column: span 2;
+    padding: 12px;
+    font-size: 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+button:hover {
+    background: #0056b3;
+    transform: scale(1.03);
 }
 
-li {
-  background: #fff;
-  margin: 0.5rem 0;
-  padding: 1rem;
-  border-radius: 5px;
-  position: relative;
+.car-list {
+    list-style: none;
+    padding: 0;
+}
+
+.car-list li {
+    background-color: #f9f9f9;
+    margin-bottom: 12px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.car-list li:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .delete-btn {
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-  color: red;
-  cursor: pointer;
+    font-size: 18px;
+    color: #dc3545;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.delete-btn:hover {
+    color: #a50000;
 }

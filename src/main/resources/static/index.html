@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Car Manager</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>🚗 Car Manager</h1>
+<div class="container">
+    <h1>🚗 Car Manager</h1>
 
-<form id="carForm">
-    <input type="text" id="brand" placeholder="Marke" required />
-    <input type="text" id="model" placeholder="Modell" required />
-    <input type="text" id="farbe" placeholder="Farbe" />
-    <input type="number" id="year" placeholder="Baujahr" required />
-    <button type="submit">Auto hinzufügen</button>
-</form>
+    <form id="carForm" class="form">
+        <input type="text" id="brand" placeholder="Marke" required />
+        <input type="text" id="model" placeholder="Modell" required />
+        <input type="text" id="farbe" placeholder="Farbe" />
+        <input type="number" id="year" placeholder="Baujahr" required />
+        <button type="submit">➕ Hinzufügen</button>
+    </form>
 
-<h2>🔍 Bestehende Autos</h2>
-<ul id="carList"></ul>
+    <h2>🔍 Bestehende Autos</h2>
+    <ul id="carList" class="car-list"></ul>
+</div>
 
 <script src="app.js"></script>
 </body>
