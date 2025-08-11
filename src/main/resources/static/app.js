@@ -1,3 +1,7 @@
+
+const API_URL = '/cars';
+
+
 document.addEventListener('DOMContentLoaded',() => loadCars() );
 document.getElementById('carForm').addEventListener('submit',  async function (e) {
 e.preventDefault();
