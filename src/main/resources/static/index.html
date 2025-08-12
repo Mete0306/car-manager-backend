@@ -2,24 +2,127 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Car Manager</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Fleet Manager</title>
+    <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="container">
-    <h1>🚗 Car Manager</h1>
+    <header class="header">
+        <h1>🚗 Fleet Manager</h1>
+        <p class="subtitle">Verwalte Fahrzeuge, Status, Kilometer & Wartung</p>
+    </header>
 
-    <form id="carForm" class="form">
-        <input type="text" id="brand" placeholder="Marke" required />
-        <input type="text" id="model" placeholder="Modell" required />
-        <input type="text" id="farbe" placeholder="Farbe" />
-        <input type="number" id="year" placeholder="Baujahr" required />
-        <button type="submit">➕ Hinzufügen</button>
-    </form>
 
-    <h2>🔍 Bestehende Autos</h2>
-    <ul id="carList" class="car-list"></ul>
+    <section class="card">
+        <h2>🔎 Suche & Filter</h2>
+        <div class="filters">
+            <input id="fBrand" type="text" placeholder="Marke (z. B. Porsche)"/>
+            <select id="fStatus">
+                <option value="">Status (alle)</option>
+                <option value="AVAILABLE">Verfügbar</option>
+                <option value="IN_USE">Im Einsatz</option>
+                <option value="MAINTENANCE">Wartung</option>
+            </select>
+            <input id="fYearFrom" type="number" placeholder="Baujahr von"/>
+            <input id="fYearTo" type="number" placeholder="Baujahr bis"/>
+            <button id="btnSearch">Suchen</button>
+            <button id="btnReset" class="secondary">Zurücksetzen</button>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>➕ Fahrzeug anlegen</h2>
+        <form id="carForm" class="form-grid">
+            <input id="brand" type="text" placeholder="Marke *" required />
+            <input id="model" type="text" placeholder="Modell *" required />
+            <input id="farbe" type="text" placeholder="Farbe" />
+            <input id="year" type="number" placeholder="Baujahr *" required />
+
+            <input id="vin" type="text" placeholder="VIN (Fahrgestellnr.) *" required />
+            <select id="status">
+                <option value="AVAILABLE">Verfügbar</option>
+                <option value="IN_USE">Im Einsatz</option>
+                <option value="MAINTENANCE">Wartung</option>
+            </select>
+            <input id="mileage" type="number" placeholder="Kilometerstand" />
+            <input id="price" type="number" step="0.01" placeholder="Preis (€)" />
+            <input id="lastServiceDate" type="date" placeholder="Letzte Wartung" />
+
+            <button type="submit">Speichern</button>
+        </form>
+        <p class="hint">Felder mit * sind Pflicht (und werden serverseitig validiert).</p>
+        <div id="msg" class="msg" hidden></div>
+    </section>
+
+    <!-- Tabelle -->
+    <section class="card">
+        <h2>📋 Fahrzeuge</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Marke</th><th>Modell</th><th>Farbe</th>
+                    <th>BJ</th><th>VIN</th><th>Status</th><th>KM</th>
+                    <th>Preis</th><th>Letzte Wartung</th><th>Aktionen</th>
+                </tr>
+                </thead>
+                <tbody id="carsTbody"></tbody>
+            </table>
+
+            <div id="emptyState" class="empty" hidden>Keine Fahrzeuge gefunden.</div>
+        </div>
+    </section>
+</div>
+<!-- Edit-Modal -->
+<div id="editModal" class="modal-backdrop hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Fahrzeug bearbeiten</h3>
+            <button type="button" id="editCloseBtn">✕</button>
+        </div>
+
+        <form id="editForm" class="modal-body">
+            <div class="grid">
+                <label>Marke
+                    <input id="eBrand" type="text" required>
+                </label>
+                <label>Modell
+                    <input id="eModel" type="text" required>
+                </label>
+                <label>Farbe
+                    <input id="eColor" type="text">
+                </label>
+                <label>Baujahr
+                    <input id="eYear" type="number" min="1886" required>
+                </label>
+                <label>Status
+                    <select id="eStatus">
+                        <option value="">–</option>
+                        <option value="IN_USE">Im Einsatz</option>
+                        <option value="MAINTENANCE">Wartung</option>
+                        <option value="INACTIVE">Inaktiv</option>
+                    </select>
+                </label>
+                <label>Kilometerstand
+                    <input id="eMileage" type="number" min="0">
+                </label>
+                <label>Preis (€)
+                    <input id="ePrice" type="number" step="0.01" min="0">
+                </label>
+                <label>VIN
+                    <input id="eVin" type="text">
+                </label>
+                <label>Letzte Wartung
+                    <input id="eLastService" type="date">
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="editCancelBtn" class="btn-secondary">Abbrechen</button>
+                <button type="submit" class="btn-primary">Speichern</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="app.js"></script>

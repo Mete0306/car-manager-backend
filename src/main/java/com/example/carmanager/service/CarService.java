@@ -51,7 +51,13 @@ public class CarService {
             a.setModel(uCar.getModel());
             a.setYear(uCar.getYear());
             a.setFarbe(uCar.getFarbe());
-return carRepository.save(a);
+            a.setStatus(uCar.getStatus());
+            a.setKilometerstand(uCar.getKilometerstand());
+            a.setPrice(uCar.getPrice());
+            a.setVin(uCar.getVin());
+            a.setLastServiceDate(uCar.getLastServiceDate());
+
+            return carRepository.save(a);
 
         } ).orElseThrow(()-> new CarNotFoundException(id));
 

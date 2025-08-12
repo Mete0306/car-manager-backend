@@ -1,66 +1,275 @@
+/* =========================
+   Konfiguration
+========================= */
+const API_URL = 'http://localhost:8080/cars';
 
-const API_URL = '/cars';
+/* =========================
+   DOM-Refs
+========================= */
+// Filter
+const elFBrand    = document.getElementById('fBrand');
+const elFStatus   = document.getElementById('fStatus');
+const elFYearFrom = document.getElementById('fYearFrom');
+const elFYearTo   = document.getElementById('fYearTo');
+const btnSearch   = document.getElementById('btnSearch');
+const btnReset    = document.getElementById('btnReset');
 
+// Tabelle
+const tbody      = document.getElementById('carsTbody');
+const emptyState = document.getElementById('emptyState');
 
-document.addEventListener('DOMContentLoaded',() => loadCars() );
-document.getElementById('carForm').addEventListener('submit',  async function (e) {
-e.preventDefault();
+// Create-Form
+const formCreate = document.getElementById('carForm');
+const elBrand    = document.getElementById('brand');
+const elModel    = document.getElementById('model');
+const elFarbe    = document.getElementById('farbe');
+const elYear     = document.getElementById('year');
+const elVin      = document.getElementById('vin');
+const elStatus   = document.getElementById('status');
+const elMileage  = document.getElementById('mileage');
+const elPrice    = document.getElementById('price');
+const elLastServ = document.getElementById('lastServiceDate');
 
-  const car = {
-    brand: document.getElementById('brand').value,
-    model: document.getElementById('model').value,
-    farbe: document.getElementById('farbe').value,
-    year: parseInt(document.getElementById('year').value)
-  };
+// Optionales Edit-Modal (falls vorhanden)
+const modal            = document.getElementById('editModal');
+const editForm         = document.getElementById('editForm');
+const editCloseBtn     = document.getElementById('editCloseBtn');
+const editCancelBtn    = document.getElementById('editCancelBtn');
+const eBrand           = document.getElementById('eBrand');
+const eModel           = document.getElementById('eModel');
+const eColor           = document.getElementById('eColor');
+const eYear            = document.getElementById('eYear');
+const eStatus          = document.getElementById('eStatus');
+const eMileage         = document.getElementById('eMileage');
+const ePrice           = document.getElementById('ePrice');
+const eVin             = document.getElementById('eVin');
+const eLastService     = document.getElementById('eLastService');
 
-  try {
+let selectedId = null; // aktuell im Modal bearbeitetes Auto
 
-const res= await fetch (API_URL, {
-method: 'POST',
-headers: {'Content-Type': 'application/json' },
-body: JSON.stringify(car)
-});
- if(!res.ok) {
- throw new Error ('Fehler beim Speichern' );
-
- }
-
- document.getElementById ("carForm").reset();
- loadCars();
-
- }catch (err) {
- alert('Fehler: ' + err.message );
-}
-
+/* =========================
+   Utils
+========================= */
+function toQuery(params) {
+  const q = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && String(v).trim() !== '') {
+      q.append(k, String(v).trim());
+    }
   });
+  const s = q.toString();
+  return s ? `?${s}` : '';
+}
+
+function normalizeList(data) {
+  // akzeptiert Array ODER Page<{content:[]}>
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.content)) return data.content;
+  return [];
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  return String(d).slice(0, 10);
+}
+
+function openModal()  { if (modal) modal.classList.remove('hidden'); }
+function closeModal() { if (modal) modal.classList.add('hidden'); selectedId = null; }
+
+/* =========================
+   Laden & Rendern
+========================= */
 async function loadCars() {
-  const list = document.getElementById('carList');
-  list.innerHTML = '';
+  tbody.innerHTML = '';
+  emptyState.hidden = true;
+
+  // Query aus Filtern bauen (nur füllen, wenn dein Backend Filter akzeptiert)
+  const query = toQuery({
+    brand: elFBrand?.value,
+    status: elFStatus?.value,
+    yearFrom: elFYearFrom?.value,
+    yearTo: elFYearTo?.value,
+  });
 
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(`${API_URL}${query}`);
+    console.log('GET /cars status', res.status);
+    if (!res.ok) {
+      throw new Error(`Fehler beim Laden (${res.status})`);
+    }
     const data = await res.json();
+    console.log('GET /cars body', data);
 
-    data.forEach(car => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        ${car.brand} - ${car.model} (${car.year}) [${car.farbe}]
-        <span class="delete-btn" onclick="deleteCar(${car.id})">🗑️</span>
-      `;
-      list.appendChild(li);
-    });
+    const cars = normalizeList(data);
+    if (cars.length === 0) {
+      emptyState.textContent = 'Keine Fahrzeuge gefunden.';
+      emptyState.hidden = false;
+      return;
+    }
+
+    cars.forEach(car => tbody.appendChild(renderRow(car)));
   } catch (err) {
-    list.innerHTML = 'Fehler beim Laden';
+    console.error(err);
+    emptyState.textContent = 'Fehler beim Laden';
+    emptyState.hidden = false;
   }
 }
 
+function renderRow(car) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${car.id ?? ''}</td>
+    <td>${car.brand ?? ''}</td>
+    <td>${car.model ?? ''}</td>
+    <td>${car.farbe ?? ''}</td>
+    <td>${car.year ?? ''}</td>
+    <td>${car.vin ?? ''}</td>
+    <td>${car.status ?? ''}</td>
+    <td>${car.kilometerstand ?? ''}</td>
+    <td>${car.price ?? ''}</td>
+    <td>${fmtDate(car.lastServiceDate)}</td>
+    <td>
+      <button class="no-row-open btn btn-sm btn-outline-danger" title="Löschen"
+              data-action="delete" data-id="${car.id}">🗑️</button>
+    </td>
+  `;
+
+  // Löschen-Button
+  tr.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+    e.stopPropagation();
+    deleteCar(car.id);
+  });
+
+  // Zeile klickbar -> optionales Edit-Modal
+  if (modal && editForm) {
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', () => {
+      selectedId        = car.id;
+      eBrand.value      = car.brand ?? '';
+      eModel.value      = car.model ?? '';
+      eColor.value      = car.farbe ?? '';
+      eYear.value       = car.year ?? '';
+      eStatus.value     = car.status ?? '';
+      eMileage.value    = car.kilometerstand ?? '';
+      ePrice.value      = car.price ?? '';
+      eVin.value        = car.vin ?? '';
+      eLastService.value= fmtDate(car.lastServiceDate);
+      openModal();
+    });
+  }
+
+  return tr;
+}
+
+/* =========================
+   Create
+========================= */
+if (formCreate) {
+  formCreate.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      brand: (elBrand?.value ?? '').trim(),
+      model: (elModel?.value ?? '').trim(),
+      farbe: (elFarbe?.value ?? '').trim(),
+      year:  parseInt(elYear?.value ?? '0', 10) || null,
+      vin:   (elVin?.value ?? '').trim() || null,
+      status: elStatus?.value || null,
+      kilometerstand: parseInt(elMileage?.value ?? '0', 10) || 0,
+      price: parseFloat(elPrice?.value ?? '0') || 0,
+      lastServiceDate: elLastServ?.value || null
+    };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || 'Fehler beim Speichern');
+      }
+
+      formCreate.reset();
+      await loadCars();
+    } catch (err) {
+      alert('Fehler: ' + err.message);
+    }
+  });
+}
+
+/* =========================
+   Delete
+========================= */
 async function deleteCar(id) {
+  if (!confirm(`Fahrzeug #${id} wirklich löschen?`)) return;
   try {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    loadCars();
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Löschen fehlgeschlagen');
+    await loadCars();
   } catch (err) {
-    alert('Fehler beim Löschen');
+    alert('Fehler beim Löschen: ' + err.message);
   }
+}
+// Für inline onclick-Fälle:
+window.deleteCar = deleteCar;
 
+/* =========================
+   Edit (optional mit Modal)
+========================= */
+if (modal && editForm) {
+  editCloseBtn?.addEventListener('click', closeModal);
+  editCancelBtn?.addEventListener('click', closeModal);
 
-  }
+  editForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!selectedId) return;
+
+    const payload = {
+      brand: (eBrand?.value ?? '').trim(),
+      model: (eModel?.value ?? '').trim(),
+      farbe: (eColor?.value ?? '').trim(),
+      year:  parseInt(eYear?.value ?? '0', 10) || null,
+      status: eStatus?.value || null,
+      kilometerstand: parseInt(eMileage?.value ?? '0', 10) || 0,
+      price: parseFloat(ePrice?.value ?? '0') || 0,
+      vin: (eVin?.value ?? '').trim() || null,
+      lastServiceDate: eLastService?.value || null
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/${selectedId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error(await res.text() || 'Update fehlgeschlagen');
+
+      closeModal();
+      await loadCars();
+    } catch (err) {
+      alert('Fehler: ' + err.message);
+    }
+  });
+}
+
+/* =========================
+   Suche / Reset
+========================= */
+btnSearch?.addEventListener('click', loadCars);
+
+btnReset?.addEventListener('click', () => {
+  if (elFBrand) elFBrand.value = '';
+  if (elFStatus) elFStatus.value = '';
+  if (elFYearFrom) elFYearFrom.value = '';
+  if (elFYearTo) elFYearTo.value = '';
+  loadCars();
+});
+
+/* =========================
+   Start
+========================= */
+document.addEventListener('DOMContentLoaded', () => {
+  loadCars();
+});

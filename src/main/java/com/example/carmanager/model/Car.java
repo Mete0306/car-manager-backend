@@ -36,8 +36,6 @@ public class Car {
     private Status status = Status.AVAILABLE;
 
 
-    @PositiveOrZero
-    private Integer mileage = 0;
 
     @PositiveOrZero
     @Digits(integer = 10, fraction = 2)
@@ -48,6 +46,8 @@ public class Car {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate lastServiceDate;
 
+    @Column(name = "kilometerstand")
+    private Integer kilometerstand;
     public enum Status {AVAILABLE, IN_USE, MAINTENANCE}
 
     public Car() {
@@ -73,9 +73,9 @@ public class Car {
         return farbe;
     }
 
-    public Integer getMileage() {
-        return mileage;
-    }
+  //  public Integer getMileage() {
+  //      return mileage;
+ //   }
 
     public BigDecimal getPrice() {
         return price;
@@ -93,9 +93,9 @@ public class Car {
         this.price = price;
     }
 
-    public void setMileage(Integer mileage) {
-        this.mileage = mileage;
-    }
+  //  public void setMileage(Integer mileage) {
+       // this.mileage = mileage;
+  //  }
 
     public Status getStatus() {
         return status;
@@ -131,6 +131,14 @@ public class Car {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getKilometerstand() {
+        return kilometerstand;
+    }
+
+    public void setKilometerstand(Integer kilometerStand) {
+        this.kilometerstand = kilometerStand;
     }
 }
 
