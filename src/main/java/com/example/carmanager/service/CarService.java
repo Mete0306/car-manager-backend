@@ -59,6 +59,24 @@ return carRepository.save(a);
 
     }
 
+    public List<Car> findByStatus(String status) {
+        Car.Status st = Car.Status.valueOf(status.toUpperCase());
+        return carRepository.findByStatus(st);
+    }
+
+    public List<Car> findByBrand(String brand) {
+        return carRepository.findByBrandContainingIgnoreCase(brand);
+    }
+
+    public List<Car> findByYearRange(int from, int to) {
+        return carRepository.findByYearBetween(from, to);
+    }
+
+    public List<Car> findByFarbe(String farbe) {
+        return carRepository.findByFarbeContainingIgnoreCase(farbe);
+    }
+
+
 
 
 
