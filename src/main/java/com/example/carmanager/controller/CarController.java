@@ -53,5 +53,16 @@ public ResponseEntity<Car> updateCar(@PathVariable Long id, @RequestBody Car car
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Car>> search(
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) Car.Status status,
+            @RequestParam(required = false) Integer yearFrom,
+            @RequestParam(required = false) Integer yearTo
+    ) {
+        List<Car> result = carService.search(brand, status, yearFrom, yearTo);
+        return ResponseEntity.ok(result);
+    }
+
 
 }

@@ -57,7 +57,7 @@
 
     <!-- Tabelle -->
     <section class="card">
-        <h2>📋 Fahrzeuge</h2>
+        <h2>Fahrzeuge</h2>
         <div class="table-wrap">
             <table class="table">
                 <thead>
@@ -97,11 +97,10 @@
                     <input id="eYear" type="number" min="1886" required>
                 </label>
                 <label>Status
-                    <select id="eStatus">
-                        <option value="">–</option>
+                    <select id="eStatus" required>
+                        <option value="AVAILABLE">Verfügbar</option>
                         <option value="IN_USE">Im Einsatz</option>
-                        <option value="MAINTENANCE">Wartung</option>
-                        <option value="INACTIVE">Inaktiv</option>
+                        <option value="MAINTENANCE">In Wartung</option>
                     </select>
                 </label>
                 <label>Kilometerstand

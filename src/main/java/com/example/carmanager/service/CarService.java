@@ -84,6 +84,32 @@ public class CarService {
 
 
 
+    public List<Car> search(String brand, Car.Status status, Integer yearFrom, Integer yearTo) {
+        List<Car> cars = carRepository.findAll(); // simpel; für große Datenmengen später mit Specs/Queries
+
+        if (brand != null && !brand.isBlank()) {
+            String b = brand.toLowerCase();
+            cars = cars.stream()
+                    .filter(c -> c.getBrand() != null && c.getBrand().toLowerCase().contains(b))
+                    .toList();
+        }
+        if (status != null) {
+            cars = cars.stream()
+                    .filter(c -> c.getStatus() == status)
+                    .toList();
+        }
+        if (yearFrom != null) {
+            cars = cars.stream()
+                    .filter(c -> c.getYear() >= yearFrom)
+                    .toList();
+        }
+        if (yearTo != null) {
+            cars = cars.stream()
+                    .filter(c -> c.getYear() <= yearTo)
+                    .toList();
+        }
+        return cars;
+    }
 
 
 }

@@ -1,7 +1,11 @@
 /* =========================
    Konfiguration
 ========================= */
-const API_URL = 'http://localhost:8080/cars';
+// alt
+// const API_URL = 'http://localhost:8080/cars';
+
+// neu
+const API_URL = '/cars';
 
 /* =========================
    DOM-Refs
@@ -62,7 +66,6 @@ function toQuery(params) {
 }
 
 function normalizeList(data) {
-  // akzeptiert Array ODER Page<{content:[]}>
   if (Array.isArray(data)) return data;
   if (data && Array.isArray(data.content)) return data.content;
   return [];
@@ -77,28 +80,43 @@ function openModal()  { if (modal) modal.classList.remove('hidden'); }
 function closeModal() { if (modal) modal.classList.add('hidden'); selectedId = null; }
 
 /* =========================
+   Filter-Helpers
+========================= */
+function collectFilters() {
+  return {
+    brand:    elFBrand?.value?.trim() || '',
+    status:   elFStatus?.value || '',
+    yearFrom: elFYearFrom?.value || '',
+    yearTo:   elFYearTo?.value || ''
+  };
+}
+
+function hasAnyFilter(p) {
+  return (p.brand || p.status || p.yearFrom || p.yearTo);
+}
+
+/* =========================
    Laden & Rendern
 ========================= */
 async function loadCars() {
   tbody.innerHTML = '';
   emptyState.hidden = true;
 
-  // Query aus Filtern bauen (nur füllen, wenn dein Backend Filter akzeptiert)
-  const query = toQuery({
-    brand: elFBrand?.value,
-    status: elFStatus?.value,
-    yearFrom: elFYearFrom?.value,
-    yearTo: elFYearTo?.value,
-  });
+  const params = collectFilters();
+  const query  = toQuery(params);
+
+  const endpoint = hasAnyFilter(params)
+      ? `${API_URL}/search${query}`
+      : `${API_URL}`;
 
   try {
-    const res = await fetch(`${API_URL}${query}`);
-    console.log('GET /cars status', res.status);
+    const res = await fetch(endpoint);
+    console.log(`GET ${endpoint} status`, res.status);
     if (!res.ok) {
       throw new Error(`Fehler beim Laden (${res.status})`);
     }
     const data = await res.json();
-    console.log('GET /cars body', data);
+    console.log('Body:', data);
 
     const cars = normalizeList(data);
     if (cars.length === 0) {
@@ -106,7 +124,6 @@ async function loadCars() {
       emptyState.hidden = false;
       return;
     }
-
     cars.forEach(car => tbody.appendChild(renderRow(car)));
   } catch (err) {
     console.error(err);
@@ -134,26 +151,24 @@ function renderRow(car) {
     </td>
   `;
 
-  // Löschen-Button
   tr.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
     e.stopPropagation();
     deleteCar(car.id);
   });
 
-  // Zeile klickbar -> optionales Edit-Modal
   if (modal && editForm) {
     tr.style.cursor = 'pointer';
     tr.addEventListener('click', () => {
-      selectedId        = car.id;
-      eBrand.value      = car.brand ?? '';
-      eModel.value      = car.model ?? '';
-      eColor.value      = car.farbe ?? '';
-      eYear.value       = car.year ?? '';
-      eStatus.value     = car.status ?? '';
-      eMileage.value    = car.kilometerstand ?? '';
-      ePrice.value      = car.price ?? '';
-      eVin.value        = car.vin ?? '';
-      eLastService.value= fmtDate(car.lastServiceDate);
+      selectedId         = car.id;
+      eBrand.value       = car.brand ?? '';
+      eModel.value       = car.model ?? '';
+      eColor.value       = car.farbe ?? '';
+      eYear.value        = car.year ?? '';
+      eStatus.value      = car.status ?? '';
+      eMileage.value     = car.kilometerstand ?? '';
+      ePrice.value       = car.price ?? '';
+      eVin.value         = car.vin ?? '';
+      eLastService.value = fmtDate(car.lastServiceDate);
       openModal();
     });
   }
@@ -186,10 +201,7 @@ if (formCreate) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(txt || 'Fehler beim Speichern');
-      }
+      if (!res.ok) throw new Error(await res.text() || 'Fehler beim Speichern');
 
       formCreate.reset();
       await loadCars();
@@ -212,7 +224,6 @@ async function deleteCar(id) {
     alert('Fehler beim Löschen: ' + err.message);
   }
 }
-// Für inline onclick-Fälle:
 window.deleteCar = deleteCar;
 
 /* =========================
@@ -257,13 +268,15 @@ if (modal && editForm) {
 /* =========================
    Suche / Reset
 ========================= */
-btnSearch?.addEventListener('click', loadCars);
+btnSearch?.addEventListener('click', () => {
+  loadCars();
+});
 
 btnReset?.addEventListener('click', () => {
-  if (elFBrand) elFBrand.value = '';
-  if (elFStatus) elFStatus.value = '';
+  if (elFBrand)    elFBrand.value = '';
+  if (elFStatus)   elFStatus.value = '';
   if (elFYearFrom) elFYearFrom.value = '';
-  if (elFYearTo) elFYearTo.value = '';
+  if (elFYearTo)   elFYearTo.value = '';
   loadCars();
 });
 
