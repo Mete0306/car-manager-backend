@@ -5,7 +5,8 @@
 // const API_URL = 'http://localhost:8080/cars';
 
 // neu
-const API_URL = '/cars';
+const API_URL = 'https://car-manager-backend-nte1.onrender.com/cars';
+
 
 /* =========================
    DOM-Refs
