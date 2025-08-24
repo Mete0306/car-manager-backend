@@ -8,4 +8,10 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: DATABASE_URL
+        value: jdbc:postgresql://dpg-d2edhubuibsr73ft3sdg-a.frankfurt-postgres.render.com:5432/car_manager_db_n9hg
+      - key: DATABASE_USERNAME
+        value: car_manager_db_n9hg_user
+      - key: DATABASE_PASSWORD
+        value: 029h8d20h8KQdW5scfL4sQk1x0PAxaxg
 
